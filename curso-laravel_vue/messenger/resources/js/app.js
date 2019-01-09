@@ -5,6 +5,9 @@ window.Vue = require('vue');
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue);
 
+Vue.component('messenger-component',
+	require('./components/MessengerComponent.vue').default
+);
 
 Vue.component('contact-component',
 	require('./components/ContactComponent.vue').default
@@ -15,8 +18,9 @@ Vue.component('contact-list-component',
 Vue.component('active-conversation-component',
 	require('./components/ActiveConversationComponent.vue').default
 );
-
-
+Vue.component('message-conversation-component',
+	require('./components/MessageConversationComponent.vue').default
+);
 
 
 const app = new Vue({
