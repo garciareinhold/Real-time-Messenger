@@ -8,6 +8,9 @@ Vue.use(BootstrapVue);
 Vue.component('messenger-component',
 	require('./components/MessengerComponent.vue').default
 );
+Vue.component('status-component',
+	require('./components/StatusComponent.vue').default
+);
 
 Vue.component('contact-component',
 	require('./components/ContactComponent.vue').default

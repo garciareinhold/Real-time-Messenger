@@ -10,7 +10,7 @@
 <script>
     export default {
         props: {
-            writtenByMe: Boolean
+          writtenByMe: Boolean
         },
         data() {
             return {

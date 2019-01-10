@@ -2,9 +2,17 @@
 	<b-container fluid style="height: calc(100vh - 56px);">
 	    <b-row no-gutters>
 	        <b-col cols="4">
+						<b-form class="my-3 mx-2">
+		            <b-form-input class="text-center"
+		                type="text"
+										v-model="querySearch"
+		                placeholder="Buscar contacto ...">
+		            </b-form-input>
+		        </b-form>
 	            <contact-list-component
 	            	@conversationSelected="changeActiveConversation($event)"
-	            	:conversations="conversations">
+	            	:conversations="conversationsFiltered"
+								>
 
 	            </contact-list-component>
 	        </b-col>
@@ -31,7 +39,8 @@
             return {
             	selectedConversation: null,
             	messages: [],
-            	conversations: []
+            	conversations: [],
+							querySearch: ''
             };
         },
         mounted() {
@@ -43,6 +52,26 @@
 
 	    		this.addMessage(message);
 		    });
+				Echo.join(`messenger`)
+				//que users estan presentes
+			    .here((users) => {
+						console.log('online', users);
+						users.forEach((user)=>{
+							this.changeStatusContacts(user,true);
+						})
+			    })
+					//quienes entran
+			    .joining((user) => {
+						console.log(user.id + "acaba de conectarse");
+						this.changeStatusContacts(user, true);
+
+			    })
+					//quienes salen
+			    .leaving((user) => {
+			        this.changeStatusContacts(user, false);
+
+			    });
+
         },
         methods: {
             changeActiveConversation(conversation) {
@@ -50,7 +79,7 @@
             	this.getMessages();
             },
             getMessages() {
-                axios.get(`/api/messages?contact_id=${this.selectedConversation.contact_id}`)
+                axios.get(`/proyectos/curso-laravel_vue/messenger/public/api/messages?contact_id=${this.selectedConversation.contact_id}`)
                 .then((response) => {
                     // console.log(response.data);
                     this.messages = response.data;
@@ -70,11 +99,26 @@
         			this.messages.push(message);
             },
             getConversations() {
-                axios.get('/api/conversations')
+                axios.get('/proyectos/curso-laravel_vue/messenger/public/api/conversations')
                 .then((response) => {
                     this.conversations = response.data;
                 });
-            }
-        }
+            },
+						changeStatusContacts(user, status){
+							const indexConver=	this.conversations.findIndex((conversation)=>{
+								return conversation.contact_id == user.id;
+							})
+							if(indexConver>=0)
+							this.$set(this.conversations[indexConver], 'online', status);
+
+						}
+        },
+				computed: {
+					conversationsFiltered(){
+						return this.conversations.filter((conversation)=>conversation.contact_name
+							.toLowerCase()
+							.includes(this.querySearch));
+					}
+				}
     }
 </script>
